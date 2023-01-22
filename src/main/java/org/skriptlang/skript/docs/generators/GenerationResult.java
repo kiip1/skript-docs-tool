@@ -1,7 +1,9 @@
 package org.skriptlang.skript.docs.generators;
 
 import org.jetbrains.annotations.ApiStatus;
+import org.skriptlang.skript.registration.SyntaxInfo;
 
+import java.util.List;
 import java.util.Locale;
 import java.util.concurrent.atomic.AtomicInteger;
 
@@ -22,6 +24,16 @@ public interface GenerationResult {
 	String[] examples();
 	
 	String since();
+	
+	Class<?> type();
+	
+	List<String> patterns();
+	
+	SyntaxInfo<?> info();
+	
+	default String[] keywords() {
+		return new String[0];
+	}
 	
 	default String[] requiredPlugins() {
 		return new String[0];

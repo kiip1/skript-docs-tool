@@ -1,23 +1,34 @@
 package org.skriptlang.skript.docs.generators;
 
 import ch.njol.skript.doc.Description;
+import ch.njol.skript.doc.DocumentationId;
 import ch.njol.skript.doc.Events;
 import ch.njol.skript.doc.Examples;
+import ch.njol.skript.doc.Keywords;
 import ch.njol.skript.doc.Name;
 import ch.njol.skript.doc.RequiredPlugins;
 import ch.njol.skript.doc.Since;
 import ch.njol.skript.util.MarkedForRemoval;
 import org.jetbrains.annotations.Nullable;
+import org.skriptlang.skript.registration.SyntaxInfo;
 
 import java.lang.annotation.Annotation;
+import java.util.List;
 import java.util.function.Function;
 
 final class GenerationResultImpl implements GenerationResult {
 	
+	private final SyntaxInfo<?> info;
 	private final Class<?> clazz;
 	
-	public GenerationResultImpl(Class<?> clazz) {
+	public GenerationResultImpl(SyntaxInfo<?> info, Class<?> clazz) {
+		this.info = info;
 		this.clazz = clazz;
+	}
+	
+	@Override
+	public String documentationId() {
+		return consumer(DocumentationId.class, DocumentationId::value, GenerationResult.super.documentationId());
 	}
 	
 	@Override
@@ -41,9 +52,29 @@ final class GenerationResultImpl implements GenerationResult {
 	}
 	
 	@Override
+	public Class<?> type() {
+		return clazz;
+	}
+	
+	@Override
+	public List<String> patterns() {
+		return info.patterns();
+	}
+	
+	@Override
+	public SyntaxInfo<?> info() {
+		return info;
+	}
+	
+	@Override
 	@Nullable
 	public String[] requiredPlugins() {
 		return consumer(RequiredPlugins.class, RequiredPlugins::value, new String[0]);
+	}
+	
+	@Override
+	public String[] keywords() {
+		return consumer(Keywords.class, Keywords::value, new String[0]);
 	}
 	
 	@Override

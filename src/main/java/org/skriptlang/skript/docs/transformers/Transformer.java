@@ -6,15 +6,19 @@ import org.skriptlang.skript.docs.generators.GenerationResult;
 import java.util.List;
 
 @ApiStatus.Experimental
-public interface Transformer<T> {
+public interface Transformer<T, G extends GenerationResult> {
 	
-	T transform(GenerationResult result);
+	T transform(G result);
 	
 	T combine(T a, T b);
 	
-	default T transform(List<GenerationResult> results) {
+	default T finisher(T value) {
+		return value;
+	}
+	
+	default T transform(List<G> results) {
 		T previous = null;
-		for (GenerationResult result : results) {
+		for (G result : results) {
 			T current = transform(result);
 			if (previous == null) {
 				previous = current;
@@ -23,7 +27,7 @@ public interface Transformer<T> {
 			}
 		}
 		
-		return previous;
+		return finisher(previous);
 	}
 	
 }
