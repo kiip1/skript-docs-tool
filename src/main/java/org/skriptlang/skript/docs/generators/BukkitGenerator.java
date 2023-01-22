@@ -16,10 +16,13 @@ public final class BukkitGenerator implements Generator<GenerationResult> {
 		if (syntax.type().getDeclaredAnnotation(NoDoc.class) != null)
 			return null;
 		
-		if (!(syntax instanceof BukkitSyntaxInfos.Event) && syntax.type().getAnnotation(Name.class) == null)
-			return null;
+		if (syntax instanceof BukkitSyntaxInfos.Event)
+			return new EventGenerationResult((BukkitSyntaxInfos.Event<?>) syntax, syntax.type());
+
+		if (syntax.type().getAnnotation(Name.class) != null)
+			return new StandardGenerationResult(syntax, syntax.type());
 		
-		return new StandardGenerationResult(syntax, syntax.type());
+		return null;
 	}
 	
 }

@@ -7,14 +7,10 @@ import ch.njol.skript.util.Utils;
 import ch.njol.util.Callback;
 import ch.njol.util.NonNullPair;
 import ch.njol.util.StringUtils;
-import com.google.common.base.CaseFormat;
 import org.eclipse.jdt.annotation.Nullable;
 import org.jetbrains.annotations.ApiStatus;
 
 import java.io.File;
-import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.atomic.AtomicInteger;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -31,7 +27,6 @@ public final class Documentation {
 	private static final Pattern CP_EXTRA_OPTIONAL_PATTERN = Pattern.compile("\\[\\(((\\w+? ?)+)\\)]");
 	private static final File DOCS_TEMPLATE_DIRECTORY = new File(Skript.getInstance().getDataFolder(), "doc-templates");
 	private static final File DOCS_OUTPUT_DIRECTORY = new File(Skript.getInstance().getDataFolder(), "docs");
-	private static final Map<String, AtomicInteger> DOCUMENTATION_CACHE = new ConcurrentHashMap<>();
 
 	/**
 	 * Force register hooks even if their plugins are not present in the server
@@ -153,7 +148,9 @@ public final class Documentation {
 						final NonNullPair<String, Boolean> p = Utils.getEnglishPlural(c);
 						final ClassInfo<?> ci = Classes.getClassInfoNoError(p.getFirst());
 						if (ci != null && ci.hasDocs()) { // equals method throws null error when doc name is null
-							b.append("<a href='./classes.html#").append(p.getFirst()).append("'>").append(ci.getName().toString(p.getSecond())).append("</a>");
+							b.append("<a href='./classes.html#")
+								.append(p.getFirst()).append("'>").
+								append(ci.getName().toString(p.getSecond())).append("</a>");
 						} else {
 							b.append(c);
 							if (ci != null && ci.hasDocs())
@@ -164,12 +161,6 @@ public final class Documentation {
 				});
 		assert s != null : patterns;
 		return s;
-	}
-	
-	public static String documentationId(String name) {
-		name = CaseFormat.UPPER_CAMEL.to(CaseFormat.LOWER_HYPHEN, name).replace(" ", "-");
-		int id = DOCUMENTATION_CACHE.computeIfAbsent(name, $ -> new AtomicInteger()).incrementAndGet();
-		return id == 1 ? name : name + "-" + id;
 	}
 
 	private static String escapeHTML(@Nullable String input) {

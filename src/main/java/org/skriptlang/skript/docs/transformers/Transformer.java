@@ -1,6 +1,7 @@
 package org.skriptlang.skript.docs.transformers;
 
 import org.jetbrains.annotations.ApiStatus;
+import org.jetbrains.annotations.Nullable;
 import org.skriptlang.skript.docs.generators.GenerationResult;
 
 import java.util.List;
@@ -10,7 +11,7 @@ public interface Transformer<T, G extends GenerationResult> {
 	
 	T transform(G result);
 	
-	T combine(T a, T b);
+	T combine(@Nullable T a, @Nullable T b);
 	
 	default T finisher(T value) {
 		return value;

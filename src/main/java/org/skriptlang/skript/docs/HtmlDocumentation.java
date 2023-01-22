@@ -9,13 +9,12 @@ import ch.njol.skript.lang.function.JavaFunction;
 import ch.njol.skript.lang.function.Parameter;
 import ch.njol.skript.registrations.Classes;
 import com.google.common.base.Joiner;
-import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Lists;
 import com.google.common.io.Files;
 import org.eclipse.jdt.annotation.Nullable;
 import org.jetbrains.annotations.ApiStatus;
 import org.skriptlang.skript.bukkit.registration.BukkitRegistry;
-import org.skriptlang.skript.docs.generators.DefaultGenerator;
+import org.skriptlang.skript.docs.generators.BukkitGenerator;
 import org.skriptlang.skript.docs.generators.GenerationResult;
 import org.skriptlang.skript.docs.transformers.HtmlTransformer;
 import org.skriptlang.skript.registration.SkriptRegistry;
@@ -73,9 +72,9 @@ public final class HtmlDocumentation {
 	 * given in the constructor.
 	 */
 	public void generate() {
-		for (File f : template.listFiles()) {
-			if (f.getName().matches("css|js|assets")) { // Copy CSS/JS/Assets folders
-				String slashName = "/" + f.getName();
+		for (File file : template.listFiles()) {
+			if (file.getName().matches("css|js|assets")) { // Copy CSS/JS/Assets folders
+				String slashName = "/" + file.getName();
 				File fileTo = new File(output + slashName);
 				fileTo.mkdirs();
 				for (File filesInside : new File(template + slashName).listFiles()) {
@@ -96,23 +95,23 @@ public final class HtmlDocumentation {
 					}
 				}
 				continue;
-			} else if (f.isDirectory()) // Ignore other directories
+			} else if (file.isDirectory()) // Ignore other directories
 				continue;
-			if (f.getName().endsWith("template.html") || f.getName().endsWith(".md"))
+			if (file.getName().endsWith("template.html") || file.getName().endsWith(".md"))
 				continue; // Ignore skeleton and README
 
-			Skript.info("Creating documentation for " + f.getName());
+			Skript.info("Creating documentation for " + file.getName());
 
-			String content = readFile(f);
+			String content = readFile(file);
 			String page;
-			if (f.getName().endsWith(".html"))
+			if (file.getName().endsWith(".html"))
 				page = skeleton.replace("${content}", content); // Content to inside skeleton
 			else // Not HTML, so don't even try to use template.html
 				page = content;
 
 			page = page.replace("${skript.version}", Skript.getVersion().toString()); // Skript version
 			page = page.replace("${skript.build.date}", new SimpleDateFormat("dd/MM/yyyy").format(new Date())); // Build date
-			page = page.replace("${pagename}", f.getName().replace(".html", ""));
+			page = page.replace("${pagename}", file.getName().replace(".html", ""));
 
 			List<String> replace = Lists.newArrayList();
 			int include = page.indexOf("${include"); // Single file includes
@@ -140,36 +139,41 @@ public final class HtmlDocumentation {
 				String genType = genParams[0];
 				boolean isDocsPage = genType.equals("docs");
 				
-				HtmlTransformer transformer = new HtmlTransformer(template.toPath(), genType, descTemp);
+				HtmlTransformer transformer = new HtmlTransformer(template.toPath(), descTemp);
 				if (genType.equals("expressions") || isDocsPage) {
-					List<GenerationResult> results = new DefaultGenerator().generate(Skript.instance().registry(),
-							ImmutableList.of(SkriptRegistry.Key.EXPRESSION));
+					List<GenerationResult> results = new BukkitGenerator().generate(Skript.instance().registry(),
+							SkriptRegistry.Key.EXPRESSION);
 					results.sort(Comparator.comparing(GenerationResult::name));
-					generated.append(transformer.transform(results));
+					generated.append(transformer.transform(results).replaceAll(
+						Pattern.quote("${element.type}"), "Expression"));
 				}
 				if (genType.equals("effects") || isDocsPage) {
-					List<GenerationResult> results = new DefaultGenerator().generate(Skript.instance().registry(),
-							ImmutableList.of(SkriptRegistry.Key.EFFECT));
+					List<GenerationResult> results = new BukkitGenerator().generate(Skript.instance().registry(),
+							SkriptRegistry.Key.EFFECT);
 					results.sort(Comparator.comparing(GenerationResult::name));
-					generated.append(transformer.transform(results));
+					generated.append(transformer.transform(results).replaceAll(
+						Pattern.quote("${element.type}"), "Effect"));
 				}
 				if (genType.equals("conditions") || isDocsPage) {
-					List<GenerationResult> results = new DefaultGenerator().generate(Skript.instance().registry(),
-							ImmutableList.of(SkriptRegistry.Key.CONDITION));
+					List<GenerationResult> results = new BukkitGenerator().generate(Skript.instance().registry(),
+							SkriptRegistry.Key.CONDITION);
 					results.sort(Comparator.comparing(GenerationResult::name));
-					generated.append(transformer.transform(results));
+					generated.append(transformer.transform(results).replaceAll(
+						Pattern.quote("${element.type}"), "Condition"));
 				}
 				if (genType.equals("sections") || isDocsPage) {
-					List<GenerationResult> results = new DefaultGenerator().generate(Skript.instance().registry(),
-							ImmutableList.of(SkriptRegistry.Key.SECTION));
+					List<GenerationResult> results = new BukkitGenerator().generate(Skript.instance().registry(),
+							SkriptRegistry.Key.SECTION);
 					results.sort(Comparator.comparing(GenerationResult::name));
-					generated.append(transformer.transform(results));
+					generated.append(transformer.transform(results).replaceAll(
+						Pattern.quote("${element.type}"), "Section"));
 				}
 				if (genType.equals("events") || isDocsPage) {
-					List<GenerationResult> results = new DefaultGenerator().generate(Skript.instance().registry(),
-							ImmutableList.of(BukkitRegistry.EVENT));
+					List<GenerationResult> results = new BukkitGenerator().generate(Skript.instance().registry(),
+							BukkitRegistry.EVENT);
 					results.sort(Comparator.comparing(GenerationResult::name));
-					generated.append(transformer.transform(results));
+					generated.append(transformer.transform(results).replaceAll(
+						Pattern.quote("${element.type}"), "Event"));
 				}
 				if (genType.equals("classes") || isDocsPage) {
 					List<ClassInfo<?>> classes = new ArrayList<>(Classes.getClassInfos());
@@ -192,7 +196,7 @@ public final class HtmlDocumentation {
 				generate = page.indexOf("${generate", nextBracket);
 			}
 			
-			String name = f.getName();
+			String name = file.getName();
 			if (name.endsWith(".html")) // Fix some stuff specially for HTML
 				page = minifyHtml(page.replace("\t", "&nbsp;&nbsp;&nbsp;&nbsp;")); // Tab to 4 non-collapsible spaces
 			writeFile(new File(output + File.separator + name), page);
@@ -248,7 +252,7 @@ public final class HtmlDocumentation {
 				.replace("\\", "\\\\").replace("\"", "\\\"").replace("\t", "    "));
 
 		// Documentation ID
-		String ID = Documentation.documentationId(info.getDocumentationID() != null ? info.getDocumentationID() : info.getCodeName());
+		String ID = info.getDocumentationID() == null ? info.getCodeName() : info.getDocumentationID();
 		desc = desc.replace("${element.id}", ID);
 
 		// Events

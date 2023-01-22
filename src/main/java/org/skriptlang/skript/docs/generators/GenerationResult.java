@@ -1,7 +1,6 @@
 package org.skriptlang.skript.docs.generators;
 
 import org.jetbrains.annotations.ApiStatus;
-import org.skriptlang.skript.docs.Documentation;
 import org.skriptlang.skript.registration.SyntaxInfo;
 
 import java.util.List;
@@ -9,9 +8,7 @@ import java.util.List;
 @ApiStatus.Experimental
 public interface GenerationResult {
 	
-	default String documentationId() {
-		return Documentation.documentationId(name());
-	}
+	String documentationId();
 	
 	String name();
 	

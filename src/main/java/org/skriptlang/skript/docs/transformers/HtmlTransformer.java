@@ -5,6 +5,7 @@ import ch.njol.skript.classes.ClassInfo;
 import ch.njol.skript.registrations.Classes;
 import com.google.common.base.Joiner;
 import org.jetbrains.annotations.ApiStatus;
+import org.jetbrains.annotations.Nullable;
 import org.skriptlang.skript.docs.Documentation;
 import org.skriptlang.skript.docs.generators.GenerationResult;
 import org.skriptlang.skript.registration.SyntaxInfo;
@@ -23,17 +24,16 @@ public final class HtmlTransformer implements Transformer<String, GenerationResu
 	private static final Pattern NEW_TAG_PATTERN = Pattern.compile(SKRIPT_VERSION + "(?!\\.)"); // (?!\\.) to avoid matching 2.6 in 2.6.1 etc.
 	
 	private final Path root;
-	private final String type;
-	private String desc;
+	private final String baseDesc;
 	
-	public HtmlTransformer(Path root, String type, String desc) {
+	public HtmlTransformer(Path root, String baseDesc) {
 		this.root = root;
-		this.type = type;
-		this.desc = desc;
+		this.baseDesc = baseDesc;
 	}
 	
 	@Override
 	public String transform(GenerationResult result) {
+		String desc = baseDesc;
 		desc = desc.replace("${element.name}", result.name());
 		desc = desc.replace("${element.since}", result.since());
 		desc = desc.replace("${element.keywords}", Joiner.on(", ").join(result.keywords()));
@@ -62,7 +62,6 @@ public final class HtmlTransformer implements Transformer<String, GenerationResu
 		desc = replaceReturnType(desc, returnType);
 		desc = handleIf(desc, "${if by-addon}", false);
 		desc = handleIf(desc, "${if new-element}", NEW_TAG_PATTERN.matcher(result.since()).find());
-		desc = desc.replace("${element.type}", type);
 		List<String> toGen = new ArrayList<>();
 		int generate = desc.indexOf("${generate");
 		while (generate != -1) {
@@ -90,8 +89,8 @@ public final class HtmlTransformer implements Transformer<String, GenerationResu
 	}
 	
 	@Override
-	public String combine(String a, String b) {
-		return a + b;
+	public String combine(@Nullable String a, @Nullable String b) {
+		return (a == null ? "" : a) + (b == null ? "" : b);
 	}
 	
 }
