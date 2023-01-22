@@ -76,7 +76,7 @@ public final class HtmlTransformer implements Transformer<String, GenerationResu
 		// Assume element.pattern generate
 		for (String data : toGen) {
 			String[] split = data.split(" ");
-			String pattern = HtmlDocumentation.readFile(root.resolveSibling("templates").resolve(split[1]).toFile());
+			String pattern = HtmlDocumentation.readFile(root.resolve("templates").resolve(split[1]).toFile());
 			StringBuilder patterns = new StringBuilder();
 			for (String line : result.patterns())
 				patterns.append(pattern.replace("${element.pattern}", Documentation.cleanPatterns(line)));
