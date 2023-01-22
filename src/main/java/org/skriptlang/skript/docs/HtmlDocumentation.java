@@ -39,7 +39,7 @@ public final class HtmlDocumentation {
 
 	private static final String SKRIPT_VERSION = Skript.getVersion().toString().replaceAll("-(dev|alpha|beta)\\d*", ""); // Filter branches
 	private static final Pattern NEW_TAG_PATTERN = Pattern.compile(SKRIPT_VERSION + "(?!\\.)"); // (?!\\.) to avoid matching 2.6 in 2.6.1 etc.
-	private static final Pattern RETURN_TYPE_LINK_PATTERN = Pattern.compile("( ?href=\"(classes\\.html|)#|)\\$\\{element\\.return-type-linkcheck}");
+	private static final Pattern RETURN_TYPE_LINK_PATTERN = Pattern.compile("(<a ?href=\"(classes\\.html|)#|)\\$\\{element\\.return-type-linkcheck}(\">(.*)</a>)");
 
 	private final File template;
 	private final File output;
@@ -435,9 +435,12 @@ public final class HtmlDocumentation {
 		if (returnType == null)
 			return handleIf(desc, "${if return-type}", false);
 		
-		boolean noDoc = returnType.hasDocs();
+		boolean noDoc = !returnType.hasDocs();
 		String returnTypeName = noDoc ? returnType.getCodeName() : returnType.getDocName();
-		String returnTypeLink = noDoc ? "" : "$1" + (returnType.getDocumentationID() == null ? returnType.getCodeName() : returnType.getDocumentationID());
+		String name = (returnType.getDocumentationID() == null ? returnType.getCodeName() : returnType.getDocumentationID());
+		String returnTypeLink = noDoc
+			? "<span>" + name + "</span>"
+			: "$1" + name + "$3";
 		
 		desc = handleIf(desc, "${if return-type}", true);
 		desc = RETURN_TYPE_LINK_PATTERN.matcher(desc).replaceAll(returnTypeLink);
