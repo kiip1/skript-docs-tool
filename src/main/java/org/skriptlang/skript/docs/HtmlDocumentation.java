@@ -208,7 +208,7 @@ public final class HtmlDocumentation {
 		boolean space = false;
 		for (int i = 0; i < page.length();) {
 			int c = page.codePointAt(i);
-			if ((c == '\n' || c == ' ')) {
+			if ((c == '\r' || c == '\n' || c == ' ')) {
 				if (!space) {
 					sb.append(' ');
 					space = true;
