@@ -4,10 +4,11 @@ import ch.njol.skript.doc.Name;
 import ch.njol.skript.doc.NoDoc;
 import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.Nullable;
+import org.skriptlang.skript.bukkit.registration.BukkitSyntaxInfos;
 import org.skriptlang.skript.registration.SyntaxInfo;
 
 @ApiStatus.Internal
-public final class DefaultGenerator implements Generator<GenerationResult> {
+public final class BukkitGenerator implements Generator<GenerationResult> {
 	
 	@Nullable
 	@Override
@@ -15,10 +16,10 @@ public final class DefaultGenerator implements Generator<GenerationResult> {
 		if (syntax.type().getDeclaredAnnotation(NoDoc.class) != null)
 			return null;
 		
-		if (syntax.type().getAnnotation(Name.class) == null)
+		if (!(syntax instanceof BukkitSyntaxInfos.Event) && syntax.type().getAnnotation(Name.class) == null)
 			return null;
 		
-		return new GenerationResultImpl(syntax, syntax.type());
+		return new StandardGenerationResult(syntax, syntax.type());
 	}
 	
 }

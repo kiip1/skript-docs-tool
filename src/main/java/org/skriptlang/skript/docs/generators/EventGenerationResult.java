@@ -5,11 +5,11 @@ import ch.njol.skript.doc.DocumentationId;
 import ch.njol.skript.doc.Events;
 import ch.njol.skript.doc.Examples;
 import ch.njol.skript.doc.Keywords;
-import ch.njol.skript.doc.Name;
 import ch.njol.skript.doc.RequiredPlugins;
 import ch.njol.skript.doc.Since;
 import ch.njol.skript.util.MarkedForRemoval;
 import org.jetbrains.annotations.Nullable;
+import org.skriptlang.skript.bukkit.registration.BukkitSyntaxInfos;
 import org.skriptlang.skript.registration.SyntaxInfo;
 
 import java.lang.annotation.Annotation;
@@ -17,13 +17,13 @@ import java.util.List;
 import java.util.function.Function;
 import java.util.function.Supplier;
 
-final class GenerationResultImpl implements GenerationResult {
+final class EventGenerationResult implements GenerationResult {
 	
-	private final SyntaxInfo<?> info;
+	private final BukkitSyntaxInfos.Event<?> info;
 	private final Class<?> clazz;
 	private final String id;
 	
-	public GenerationResultImpl(SyntaxInfo<?> info, Class<?> clazz) {
+	public EventGenerationResult(BukkitSyntaxInfos.Event<?> info, Class<?> clazz) {
 		this.info = info;
 		this.clazz = clazz;
 		id = consumer(DocumentationId.class, DocumentationId::value, GenerationResult.super::documentationId);
@@ -36,7 +36,7 @@ final class GenerationResultImpl implements GenerationResult {
 	
 	@Override
 	public String name() {
-		return fail(Name.class, Name::value);
+		return info.name();
 	}
 	
 	@Override
