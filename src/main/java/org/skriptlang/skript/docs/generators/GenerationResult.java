@@ -1,20 +1,16 @@
 package org.skriptlang.skript.docs.generators;
 
 import org.jetbrains.annotations.ApiStatus;
+import org.skriptlang.skript.docs.Documentation;
 import org.skriptlang.skript.registration.SyntaxInfo;
 
 import java.util.List;
-import java.util.Locale;
-import java.util.concurrent.atomic.AtomicInteger;
 
 @ApiStatus.Experimental
 public interface GenerationResult {
 	
-	AtomicInteger IOTA = new AtomicInteger();
-	
 	default String documentationId() {
-		return IOTA.getAndIncrement() + "-" + name().toLowerCase(Locale.ROOT)
-				.replaceAll(" ", "-");
+		return Documentation.documentationId(name());
 	}
 	
 	String name();

@@ -248,8 +248,7 @@ public final class HtmlDocumentation {
 				.replace("\\", "\\\\").replace("\"", "\\\"").replace("\t", "    "));
 
 		// Documentation ID
-		// TODO IOTA
-		String ID = 0 + "-" + (info.getDocumentationID() != null ? info.getDocumentationID() : info.getCodeName());
+		String ID = Documentation.documentationId(info.getDocumentationID() != null ? info.getDocumentationID() : info.getCodeName());
 		desc = desc.replace("${element.id}", ID);
 
 		// Events
@@ -311,11 +310,9 @@ public final class HtmlDocumentation {
 	}
 	
 	private String generateFunction(String descTemp, JavaFunction<?> info) {
-		String desc = "";
-
 		// Name
 		String docName = getDefaultIfNullOrEmpty(info.getName(), "Unknown Name");
-		desc = descTemp.replace("${element.name}", docName);
+		String desc = descTemp.replace("${element.name}", docName);
 
 		// Since
 		String since = getDefaultIfNullOrEmpty(info.getSince(), "Unknown");
@@ -394,18 +391,18 @@ public final class HtmlDocumentation {
 		return (string == null || string.length == 0 || string[0].equals("")) ? new String[]{ message } : string; // Null check first otherwise NullPointerException is thrown
 	}
 	
-	public static String readFile(File f) {
+	public static String readFile(File file) {
 		try {
-			return Files.toString(f, StandardCharsets.UTF_8);
+			return new String(java.nio.file.Files.readAllBytes(file.toPath()), StandardCharsets.UTF_8);
 		} catch (IOException e) {
 			e.printStackTrace();
 			return "";
 		}
 	}
 	
-	public static void writeFile(File f, String data) {
+	public static void writeFile(File file, String data) {
 		try {
-			Files.write(data, f, StandardCharsets.UTF_8);
+			Files.write(data.getBytes(StandardCharsets.UTF_8), file);
 		} catch (IOException e) {
 			e.printStackTrace();
 		}

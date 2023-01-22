@@ -5,6 +5,7 @@ import ch.njol.skript.classes.ClassInfo;
 import ch.njol.skript.registrations.Classes;
 import com.google.common.base.Joiner;
 import org.jetbrains.annotations.ApiStatus;
+import org.skriptlang.skript.docs.Documentation;
 import org.skriptlang.skript.docs.HtmlDocumentation;
 import org.skriptlang.skript.docs.generators.GenerationResult;
 import org.skriptlang.skript.registration.SyntaxInfo;
@@ -78,7 +79,7 @@ public final class HtmlTransformer implements Transformer<String, GenerationResu
 			String pattern = HtmlDocumentation.readFile(root.resolveSibling("templates").resolve(split[1]).toFile());
 			StringBuilder patterns = new StringBuilder();
 			for (String line : result.patterns())
-				patterns.append(pattern.replace("${element.pattern}", line)); // TODO Clean patterns here
+				patterns.append(pattern.replace("${element.pattern}", Documentation.cleanPatterns(line)));
 			
 			String toReplace = "${generate element.patterns " + split[1] + "}";
 			desc = desc.replace(toReplace, patterns.toString());

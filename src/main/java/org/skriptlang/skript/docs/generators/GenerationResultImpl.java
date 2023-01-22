@@ -15,6 +15,7 @@ import org.skriptlang.skript.registration.SyntaxInfo;
 import java.lang.annotation.Annotation;
 import java.util.List;
 import java.util.function.Function;
+import java.util.function.Supplier;
 
 final class GenerationResultImpl implements GenerationResult {
 	
@@ -28,7 +29,7 @@ final class GenerationResultImpl implements GenerationResult {
 	
 	@Override
 	public String documentationId() {
-		return consumer(DocumentationId.class, DocumentationId::value, GenerationResult.super.documentationId());
+		return consumer(DocumentationId.class, DocumentationId::value, GenerationResult.super::documentationId);
 	}
 	
 	@Override
@@ -69,29 +70,29 @@ final class GenerationResultImpl implements GenerationResult {
 	@Override
 	@Nullable
 	public String[] requiredPlugins() {
-		return consumer(RequiredPlugins.class, RequiredPlugins::value, new String[0]);
+		return consumer(RequiredPlugins.class, RequiredPlugins::value, () -> new String[0]);
 	}
 	
 	@Override
 	public String[] keywords() {
-		return consumer(Keywords.class, Keywords::value, new String[0]);
+		return consumer(Keywords.class, Keywords::value, () -> new String[0]);
 	}
 	
 	@Override
 	public String[] events() {
-		return consumer(Events.class, Events::value, new String[0]);
+		return consumer(Events.class, Events::value, () -> new String[0]);
 	}
 	
 	@Override
 	public boolean deprecated() {
-		return consumer(MarkedForRemoval.class, annotation -> true, false);
+		return consumer(MarkedForRemoval.class, annotation -> true, () -> false);
 	}
 	
-	private <T extends Annotation, R> R consumer(Class<? extends T> clazz, Function<T, R> consumer, R fallback) {
+	private <T extends Annotation, R> R consumer(Class<? extends T> clazz, Function<T, R> consumer, Supplier<R> fallback) {
 		T annotation = this.clazz.getDeclaredAnnotation(clazz);
-		if (annotation == null) return fallback;
+		if (annotation == null) return fallback.get();
 		R result = consumer.apply(annotation);
-		return result == null ? fallback : result;
+		return result == null ? fallback.get() : result;
 	}
 	
 	private <T extends Annotation, R> R fail(Class<? extends T> clazz, Function<T, R> consumer) {
