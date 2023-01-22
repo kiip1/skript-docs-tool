@@ -14,7 +14,14 @@ public final class DefaultGenerator implements Generator<GenerationResult> {
 		if (syntax.type().getDeclaredAnnotation(NoDoc.class) != null)
 			return null;
 		
-		return new GenerationResultImpl(syntax, syntax.type());
+		GenerationResult result = new GenerationResultImpl(syntax, syntax.type());
+		try {
+			result.name();
+		} catch (Exception ignored) {
+			return null;
+		}
+		
+		return result;
 	}
 	
 }

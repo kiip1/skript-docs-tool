@@ -10,6 +10,7 @@ import org.skriptlang.skript.docs.HtmlDocumentation;
 import org.skriptlang.skript.docs.generators.GenerationResult;
 import org.skriptlang.skript.registration.SyntaxInfo;
 
+import java.io.File;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
@@ -34,7 +35,7 @@ public final class HtmlTransformer implements Transformer<String, GenerationResu
 	
 	@Override
 	public String transform(GenerationResult result) {
-		String desc = result.type().getSimpleName().replace("${element.name}", result.name());
+		String desc = HtmlDocumentation.readFile(new File(Documentation.getDocsTemplateDirectory(), type + ".html")).replace("${element.name}", result.name());
 		desc = desc.replace("${element.since}", result.since());
 		desc = desc.replace("${element.keywords}", Joiner.on(", ").join(result.keywords()));
 		desc = desc.replace("${element.desc}", Joiner.on("\n").join(result.description()).replace("\n\n", "<p>"));
