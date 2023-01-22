@@ -29,8 +29,8 @@ public final class Documentation {
 	private static final Pattern CP_EMPTY_PARSE_MARKS_PATTERN = Pattern.compile("\\(\\)");
 	private static final Pattern CP_PARSE_TAGS_PATTERN = Pattern.compile("(?<=[(|\\[ ])[-a-zA-Z0-9!$#%^&*_+~=\"'<>?,.]*?:");
 	private static final Pattern CP_EXTRA_OPTIONAL_PATTERN = Pattern.compile("\\[\\(((\\w+? ?)+)\\)]");
-	private static final File DOCS_TEMPLATE_DIRECTORY = new File(Skript.getInstance().getScriptsFolder().getParent(), "doc-templates");
-	private static final File DOCS_OUTPUT_DIRECTORY = new File(Skript.getInstance().getScriptsFolder().getParent(), "docs");
+	private static final File DOCS_TEMPLATE_DIRECTORY = new File(Skript.getInstance().getDataFolder(), "doc-templates");
+	private static final File DOCS_OUTPUT_DIRECTORY = new File(Skript.getInstance().getDataFolder(), "docs");
 	private static final Map<String, AtomicInteger> DOCUMENTATION_CACHE = new ConcurrentHashMap<>();
 
 	/**
