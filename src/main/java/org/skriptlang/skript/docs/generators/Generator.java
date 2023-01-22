@@ -15,12 +15,15 @@ public interface Generator<T extends GenerationResult> {
 	T generate(SyntaxInfo<?> syntax);
 	
 	default List<T> generate(SkriptRegistry registry, List<SkriptRegistry.Key<?>> keys) {
-		List<T> result = new ArrayList<>();
+		List<T> results = new ArrayList<>();
 		for (SkriptRegistry.Key<?> key : keys)
-			for (SyntaxInfo<?> syntax : registry.syntaxes(key))
-				result.add(generate(syntax));
+			for (SyntaxInfo<?> syntax : registry.syntaxes(key)) {
+				T result = generate(syntax);
+				if (result != null)
+					results.add(result);
+			}
 		
-		return result;
+		return results;
 	}
 	
 }
