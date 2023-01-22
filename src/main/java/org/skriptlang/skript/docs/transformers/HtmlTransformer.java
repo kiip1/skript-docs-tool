@@ -6,7 +6,6 @@ import ch.njol.skript.registrations.Classes;
 import com.google.common.base.Joiner;
 import org.jetbrains.annotations.ApiStatus;
 import org.skriptlang.skript.docs.Documentation;
-import org.skriptlang.skript.docs.HtmlDocumentation;
 import org.skriptlang.skript.docs.generators.GenerationResult;
 import org.skriptlang.skript.registration.SyntaxInfo;
 
@@ -15,8 +14,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.regex.Pattern;
 
-import static org.skriptlang.skript.docs.HtmlDocumentation.handleIf;
-import static org.skriptlang.skript.docs.HtmlDocumentation.replaceReturnType;
+import static org.skriptlang.skript.docs.HtmlDocumentation.*;
 
 @ApiStatus.Internal
 public final class HtmlTransformer implements Transformer<String, GenerationResult> {
@@ -26,15 +24,17 @@ public final class HtmlTransformer implements Transformer<String, GenerationResu
 	
 	private final Path root;
 	private final String type;
+	private String desc;
 	
-	public HtmlTransformer(Path root, String type) {
+	public HtmlTransformer(Path root, String type, String desc) {
 		this.root = root;
 		this.type = type;
+		this.desc = desc;
 	}
 	
 	@Override
 	public String transform(GenerationResult result) {
-		String desc = HtmlDocumentation.readFile(root.resolve(type + ".html").toFile()).replace("${element.name}", result.name());
+		desc = desc.replace("${element.name}", result.name());
 		desc = desc.replace("${element.since}", result.since());
 		desc = desc.replace("${element.keywords}", Joiner.on(", ").join(result.keywords()));
 		desc = desc.replace("${element.desc}", Joiner.on("\n").join(result.description()).replace("\n\n", "<p>"));
@@ -76,7 +76,7 @@ public final class HtmlTransformer implements Transformer<String, GenerationResu
 		// Assume element.pattern generate
 		for (String data : toGen) {
 			String[] split = data.split(" ");
-			String pattern = HtmlDocumentation.readFile(root.resolve("templates").resolve(split[1]).toFile());
+			String pattern = readFile(root.resolve("templates").resolve(split[1]).toFile());
 			StringBuilder patterns = new StringBuilder();
 			for (String line : result.patterns())
 				patterns.append(pattern.replace("${element.pattern}", Documentation.cleanPatterns(line)));

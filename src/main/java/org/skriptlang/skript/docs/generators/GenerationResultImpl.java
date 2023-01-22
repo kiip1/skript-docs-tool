@@ -21,15 +21,17 @@ final class GenerationResultImpl implements GenerationResult {
 	
 	private final SyntaxInfo<?> info;
 	private final Class<?> clazz;
+	private final String id;
 	
 	public GenerationResultImpl(SyntaxInfo<?> info, Class<?> clazz) {
 		this.info = info;
 		this.clazz = clazz;
+		id = consumer(DocumentationId.class, DocumentationId::value, GenerationResult.super::documentationId);
 	}
 	
 	@Override
 	public String documentationId() {
-		return consumer(DocumentationId.class, DocumentationId::value, GenerationResult.super::documentationId);
+		return id;
 	}
 	
 	@Override

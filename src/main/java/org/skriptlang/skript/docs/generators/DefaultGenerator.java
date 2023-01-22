@@ -1,5 +1,6 @@
 package org.skriptlang.skript.docs.generators;
 
+import ch.njol.skript.doc.Name;
 import ch.njol.skript.doc.NoDoc;
 import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.Nullable;
@@ -14,14 +15,10 @@ public final class DefaultGenerator implements Generator<GenerationResult> {
 		if (syntax.type().getDeclaredAnnotation(NoDoc.class) != null)
 			return null;
 		
-		GenerationResult result = new GenerationResultImpl(syntax, syntax.type());
-		try {
-			result.name();
-		} catch (Exception ignored) {
+		if (syntax.type().getAnnotation(Name.class) == null)
 			return null;
-		}
 		
-		return result;
+		return new GenerationResultImpl(syntax, syntax.type());
 	}
 	
 }

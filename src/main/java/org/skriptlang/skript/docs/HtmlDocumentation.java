@@ -140,7 +140,7 @@ public final class HtmlDocumentation {
 				String genType = genParams[0];
 				boolean isDocsPage = genType.equals("docs");
 				
-				HtmlTransformer transformer = new HtmlTransformer(template.toPath(), genType);
+				HtmlTransformer transformer = new HtmlTransformer(template.toPath(), genType, descTemp);
 				if (genType.equals("expressions") || isDocsPage) {
 					List<GenerationResult> results = new DefaultGenerator().generate(Skript.instance().registry(),
 							ImmutableList.of(SkriptRegistry.Key.EXPRESSION));

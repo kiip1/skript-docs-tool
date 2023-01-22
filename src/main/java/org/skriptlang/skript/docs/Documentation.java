@@ -168,7 +168,8 @@ public final class Documentation {
 	
 	public static String documentationId(String name) {
 		name = CaseFormat.UPPER_CAMEL.to(CaseFormat.LOWER_HYPHEN, name).replace(" ", "-");
-		return name + "-" + DOCUMENTATION_CACHE.computeIfAbsent(name, $ -> new AtomicInteger()).incrementAndGet();
+		int id = DOCUMENTATION_CACHE.computeIfAbsent(name, $ -> new AtomicInteger()).incrementAndGet();
+		return id == 1 ? name : name + "-" + id;
 	}
 
 	private static String escapeHTML(@Nullable String input) {
